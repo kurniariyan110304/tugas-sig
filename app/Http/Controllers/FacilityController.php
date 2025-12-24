@@ -18,7 +18,7 @@ class FacilityController extends Controller
             'pasar' => 'Pasar',
             'lainnya' => 'Lainnya'
         ];
-        
+
         return view('facilities.index', compact('facilities', 'facilityTypes'));
     }
 
@@ -79,20 +79,16 @@ class FacilityController extends Controller
             ->with('success', 'Fasilitas berhasil dihapus!');
     }
 
-    public function getFacilitiesJson()
-    {
-        $facilities = Facility::all();
-        return response()->json($facilities);
-    }
 
-    public function getFacilitiesByType($type)
+    public function getFacilitiesByType(Request $request)
     {
-        if ($type == 'all') {
-            $facilities = Facility::all();
-        } else {
-            $facilities = Facility::where('type', $type)->get();
+        $query = Facility::query();
+
+        // filter berdasarkan jenis
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
         }
-        
-        return response()->json($facilities);
+
+        return response()->json($query->get());
     }
 }
