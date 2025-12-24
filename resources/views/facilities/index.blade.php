@@ -706,9 +706,35 @@
     @endif
 @endsection
 @push('scripts')
+<<<<<<< HEAD
     <script>
         let map;
         let markers = [];
+=======
+<script>
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Data langsung dari PHP (tidak perlu API)
+    var facilities = @json($facilities);
+    
+    console.log('Facilities from PHP:', facilities);
+    
+    // Inisialisasi peta
+    var map = L.map('map').setView([-6.402484, 106.794236], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    // Tambahkan marker dari data PHP
+    facilities.forEach(function(facility) {
+        L.marker([facility.latitude, facility.longitude])
+            .addTo(map)
+            .bindPopup('<b>' + facility.name + '</b>');
+    });
+});
+</script>
+@endpush
+</script>
+>>>>>>> 9edbd916af951def95f4cea2c7e0a934582e0a22
 
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
