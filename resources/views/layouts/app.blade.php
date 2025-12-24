@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'GIS Fasilitas Umum')</title>
     
@@ -11,422 +11,607 @@
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
           crossorigin=""/>
     
-    <!-- Bootstrap 4 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Custom CSS SBAdmin2 -->
+    <!-- Responsive Navbar & Sidebar CSS -->
     <style>
+        :root {
+            --primary: #4e73df;
+            --primary-dark: #224abe;
+            --sidebar-width: 250px;
+            --topbar-height: 70px;
+            --transition-speed: 0.3s;
+        }
+        
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
         
-        body {
+        html, body {
+            height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fc;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+            overflow-x: hidden;
         }
         
-        /* Sidebar Styling */
+        /* Main Wrapper */
+        #app-wrapper {
+            display: flex;
+            min-height: 100vh;
+            background: #f8f9fc;
+            position: relative;
+        }
+        
+        /* Mobile Top Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1050;
+            padding: 0 15px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        @media (max-width: 992px) {
+            .mobile-nav {
+                display: flex;
+            }
+        }
+        
+        .mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mobile-brand-icon {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .mobile-brand-text {
+            font-weight: 600;
+            color: #2e59d9;
+            font-size: 1.1rem;
+        }
+        
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: #5a5c69;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .mobile-menu-btn:hover {
+            background: #f8f9fc;
+        }
+        
+        /* Sidebar - Desktop */
         .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
             position: fixed;
             top: 0;
             left: 0;
             bottom: 0;
-            width: 250px;
-            z-index: 1000;
-            background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1040;
+            transition: transform var(--transition-speed) ease;
             overflow-y: auto;
-            padding-top: 20px;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
         }
         
-        .sidebar-sticky {
-            position: relative;
-            height: 100%;
+        /* Sidebar - Mobile State */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                top: 60px;
+                bottom: 0;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+        }
+        
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1039;
+            transition: opacity var(--transition-speed) ease;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        /* Sidebar Content */
+        .sidebar-content {
+            flex: 1;
             padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
         
+        /* Sidebar Brand */
         .sidebar-brand {
             text-align: center;
-            padding: 0 20px 30px 20px;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .sidebar-brand-icon {
             font-size: 2.5rem;
-            color: white;
             margin-bottom: 10px;
+            opacity: 0.9;
         }
         
-        .sidebar-brand-text h4 {
-            color: white;
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        
-        .sidebar-brand-text small {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.85rem;
-        }
-        
-        .sidebar .nav {
-            padding: 0 15px;
-        }
-        
-        .sidebar .nav-item {
+        .sidebar-brand-title {
+            font-size: 1.3rem;
+            font-weight: 600;
             margin-bottom: 5px;
         }
         
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
+        .sidebar-brand-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            flex: 1;
+            padding: 0 15px;
+        }
+        
+        .sidebar-nav .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-nav .nav-link {
+            color: rgba(255,255,255,0.8);
             padding: 12px 15px;
-            border-radius: 5px;
-            transition: all 0.3s;
+            border-radius: 8px;
             display: flex;
             align-items: center;
-        }
-        
-        .sidebar .nav-link i {
-            width: 25px;
-            text-align: center;
-            margin-right: 10px;
-        }
-        
-        .sidebar .nav-link:hover {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
             text-decoration: none;
+            gap: 12px;
         }
         
-        .sidebar .nav-link.active {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.2);
+        .sidebar-nav .nav-link i {
+            width: 22px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-nav .nav-link span {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+        
+        .sidebar-nav .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-nav .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.2);
             font-weight: 600;
         }
         
-        .sidebar-divider {
-            border-color: rgba(255, 255, 255, 0.2);
-            margin: 20px 0;
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
         }
         
-        /* Main Content Styling */
+        /* Main Content Area */
         .main-content {
-            margin-left: 250px;
+            flex: 1;
+            margin-left: var(--sidebar-width);
             min-height: 100vh;
-            background-color: #f8f9fc;
+            transition: margin-left var(--transition-speed) ease;
         }
         
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            
+        @media (max-width: 992px) {
             .main-content {
                 margin-left: 0;
-            }
-            
-            #sidebarToggle {
-                display: block !important;
+                padding-top: 60px;
             }
         }
         
-        /* Topbar Styling */
-        .topbar {
-            background: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border-bottom: 1px solid #e3e6f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .topbar h4 {
-            color: #5a5c69;
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        
-        .topbar h4 i {
-            color: #4e73df;
-        }
-        
-        #sidebarToggle {
-            background: none;
-            border: none;
-            color: #5a5c69;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        
-        #sidebarToggle:hover {
-            background-color: #f8f9fc;
-        }
-        
-        /* Content Area */
-        .content-area {
-            padding: 30px;
-        }
-        
-        /* Card Styling */
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid #e3e6f0;
-            padding: 20px 25px;
-            border-radius: 10px 10px 0 0 !important;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .card-header h6 {
-            margin: 0;
-            color: #4e73df;
-            font-weight: 600;
-        }
-        
-        .card-body {
+        /* Content Container */
+        .content-container {
             padding: 25px;
         }
         
-        /* Map Container - INI YANG PENTING! */
-        #map {
-            height: 500px !important;
-            width: 100% !important;
-            border-radius: 8px;
-            z-index: 1;
-            position: relative;
+        @media (max-width: 768px) {
+            .content-container {
+                padding: 20px 15px;
+            }
         }
         
-        .leaflet-container {
-            height: 100% !important;
-            width: 100% !important;
-            font-family: inherit;
-        }
-        
-        /* Alert Styling */
+        /* Alerts Responsive */
         .alert {
-            border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 15px 20px;
             margin-bottom: 20px;
+            border: none;
+            border-left: 4px solid;
         }
         
         .alert-success {
-            background-color: #d1e7dd;
+            background: #d1e7dd;
             color: #0f5132;
-            border-left: 4px solid #0f5132;
+            border-left-color: #0f5132;
         }
         
         .alert-danger {
-            background-color: #f8d7da;
+            background: #f8d7da;
             color: #842029;
-            border-left: 4px solid #842029;
+            border-left-color: #842029;
         }
         
-        /* Footer */
-        .footer {
+        .alert-dismissible .btn-close {
+            padding: 1rem;
+        }
+        
+        /* Footer Responsive */
+        .main-footer {
             background: white;
-            padding: 20px 30px;
+            padding: 20px 0;
             border-top: 1px solid #e3e6f0;
             margin-top: auto;
         }
         
-        .footer p {
-            margin: 0;
-            color: #6e707e;
+        .footer-content {
             text-align: center;
+            color: #6e707e;
+            font-size: 0.9rem;
         }
         
-        /* Badge Colors */
-        .badge-school { background-color: #3498db; }
-        .badge-hospital { background-color: #e74c3c; }
-        .badge-health { background-color: #2ecc71; }
-        .badge-worship { background-color: #9b59b6; }
-        .badge-market { background-color: #f39c12; }
-        .badge-other { background-color: #7f8c8d; }
-        
-        /* Utility Classes */
-        .shadow-sm {
-            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
         }
         
-        .rounded {
-            border-radius: 8px !important;
-        }
-        
-        /* Leaflet Popup Custom */
-        .leaflet-popup-content {
-            min-width: 250px;
-        }
-        
-        .leaflet-popup-content-wrapper {
-            border-radius: 8px;
-        }
-        
-        /* Ensure proper layout */
-        html, body {
-            height: 100%;
-        }
-        
-        .wrapper {
+        .loading-spinner.active {
             display: flex;
-            min-height: 100vh;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        
+        /* Scrollbar Styling */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .sidebar, .mobile-nav, .main-footer, .no-print {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding-top: 0 !important;
+            }
+        }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
     
     @stack('styles')
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="sidebar-sticky">
-                <div class="sidebar-brand">
-                    <div class="sidebar-brand-icon">
-                        <i class="fas fa-map-marked-alt"></i>
-                    </div>
-                    <div class="sidebar-brand-text">
-                        <h4>GIS Fasilitas</h4>
-                        <small>Sistem Informasi Geografis</small>
-                    </div>
+    <!-- Mobile Top Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-brand">
+            <i class="fas fa-map-marked-alt mobile-brand-icon"></i>
+            <span class="mobile-brand-text">GIS Fasilitas</span>
+        </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+    
+    <!-- Sidebar Overlay (Mobile Only) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <!-- Brand Logo & Title -->
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-map-marked-alt"></i>
                 </div>
-                
-                <hr class="sidebar-divider">
-                
+                <h4 class="sidebar-brand-title">GIS Fasilitas</h4>
+                <div class="sidebar-brand-subtitle">Sistem Informasi Geografis</div>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <nav class="sidebar-nav">
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link {{ Request::is('/') ? 'active' : '' }}" href="{{ route('home') }}">
-                            <i class="fas fa-fw fa-map"></i>
+                            <i class="fas fa-map"></i>
                             <span>Peta Fasilitas</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ Request::is('facilities/create') ? 'active' : '' }}" href="{{ route('facilities.create') }}">
-                            <i class="fas fa-fw fa-plus-circle"></i>
+                            <i class="fas fa-plus-circle"></i>
                             <span>Tambah Fasilitas</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ Request::is('facilities') && !Request::is('/') ? 'active' : '' }}" href="{{ route('facilities.index') }}">
-                            <i class="fas fa-fw fa-list"></i>
+                            <i class="fas fa-list"></i>
                             <span>Daftar Fasilitas</span>
                         </a>
                     </li>
                 </ul>
+            </nav>
+            
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <small>&copy; {{ date('Y') }} GIS App v1.0</small>
             </div>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Topbar -->
-            <div class="topbar">
-                <button class="btn btn-link d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h4>
-                    <i class="fas fa-map-marker-alt mr-2"></i>
-                    Sistem Informasi Geografis Fasilitas Umum
-                </h4>
+        </div>
+    </aside>
+    
+    <!-- Main Content Wrapper -->
+    <div id="app-wrapper">
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-
-            <!-- Page Content -->
-            <div class="content-area">
+        </div>
+        
+        <!-- Main Content Area -->
+        <main class="main-content" id="mainContent">
+            <div class="content-container">
+                <!-- Auto-close alerts after 5 seconds -->
                 @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle mr-2"></i>
-                        {{ session('success') }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                <div class="alert alert-success alert-dismissible fade show" role="alert" data-auto-dismiss="5000">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-3 fa-lg"></i>
+                        <div>
+                            {{ session('success') }}
+                        </div>
                     </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
                 @endif
                 
                 @if($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle mr-2"></i>
-                        <strong>Terjadi kesalahan!</strong>
-                        <ul class="mb-0 mt-2 pl-3">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-exclamation-circle me-3 fa-lg mt-1"></i>
+                        <div>
+                            <strong>Terjadi kesalahan!</strong>
+                            <ul class="mb-0 mt-2 ps-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
                 @endif
                 
                 @yield('content')
             </div>
-
-            <!-- Footer -->
-            <footer class="footer">
+            
+            <!-- Main Footer -->
+            <footer class="main-footer">
                 <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12 text-center">
-                            <p>
-                                &copy; {{ date('Y') }} GIS Fasilitas Umum - Kelompok Tugas GIS
-                                <br>
-                                <small class="text-muted">Program Studi Sistem Informasi – STT Terpadu Nurul Fikri</small>
-                            </p>
-                        </div>
+                    <div class="footer-content">
+                        <p class="mb-1">
+                            &copy; {{ date('Y') }} GIS Fasilitas Umum - Kelompok Tugas GIS
+                        </p>
+                        <p class="mb-0">
+                            <small>Program Studi Sistem Informasi – STT Terpadu Nurul Fikri</small>
+                        </p>
                     </div>
                 </div>
             </footer>
-        </div>
+        </main>
     </div>
-
-    <!-- JavaScript -->
+    
+    <!-- JavaScript Libraries -->
+    <!-- Bootstrap 5 Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV11vTlZBo="
-            crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
+    <!-- Responsive Navigation Script -->
     <script>
-        // Toggle sidebar untuk mobile
-        $(document).ready(function() {
-            $('#sidebarToggle').click(function() {
-                $('.sidebar').toggleClass('d-none');
-                $('.main-content').toggleClass('ml-0');
-            });
+    $(document).ready(function() {
+        // Elements
+        const mobileMenuBtn = $('#mobileMenuBtn');
+        const sidebar = $('#sidebar');
+        const sidebarOverlay = $('#sidebarOverlay');
+        const mainContent = $('#mainContent');
+        const loadingSpinner = $('#loadingSpinner');
+        
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            sidebar.toggleClass('show');
+            sidebarOverlay.toggleClass('show');
             
-            // Auto close alerts setelah 5 detik
-            setTimeout(function() {
-                $('.alert').alert('close');
-            }, 5000);
-            
-            // Fix map size setelah sidebar toggle
-            $('#sidebarToggle').click(function() {
-                setTimeout(function() {
-                    if (window.map) {
-                        window.map.invalidateSize();
-                    }
-                }, 300);
-            });
+            // Prevent body scroll when sidebar is open
+            if (sidebar.hasClass('show')) {
+                $('body').css('overflow', 'hidden');
+            } else {
+                $('body').css('overflow', 'auto');
+            }
+        }
+        
+        // Close sidebar when clicking overlay
+        function closeSidebar() {
+            sidebar.removeClass('show');
+            sidebarOverlay.removeClass('show');
+            $('body').css('overflow', 'auto');
+        }
+        
+        // Event Listeners
+        mobileMenuBtn.click(toggleSidebar);
+        sidebarOverlay.click(closeSidebar);
+        
+        // Close sidebar when clicking outside on mobile
+        $(document).on('click', function(event) {
+            if ($(window).width() <= 992) {
+                if (!$(event.target).closest('.sidebar, .mobile-menu-btn').length) {
+                    closeSidebar();
+                }
+            }
         });
+        
+        // Close sidebar on escape key
+        $(document).on('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+        
+        // Auto-dismiss alerts
+        $('[data-auto-dismiss]').each(function() {
+            const delay = $(this).data('auto-dismiss');
+            setTimeout(() => {
+                $(this).alert('close');
+            }, delay);
+        });
+        
+        // Show loading spinner on page transitions
+        $(document).on('click', 'a', function(e) {
+            const href = $(this).attr('href');
+            const isExternal = href.startsWith('http') || href.startsWith('//');
+            const isAnchor = href.startsWith('#');
+            const isSamePage = href === window.location.pathname;
+            
+            if (!isExternal && !isAnchor && !isSamePage) {
+                loadingSpinner.addClass('active');
+            }
+        });
+        
+        // Hide loading spinner when page is loaded
+        $(window).on('load', function() {
+            loadingSpinner.removeClass('active');
+        });
+        
+        // Adjust content padding based on device
+        function adjustContentPadding() {
+            if ($(window).width() <= 992) {
+                mainContent.css('padding-top', '60px');
+            } else {
+                mainContent.css('padding-top', '0');
+            }
+        }
+        
+        // Initial adjustment
+        adjustContentPadding();
+        
+        // Adjust on resize
+        $(window).resize(function() {
+            adjustContentPadding();
+            
+            // Close sidebar when switching to desktop
+            if ($(window).width() > 992) {
+                closeSidebar();
+            }
+        });
+        
+        // Smooth scroll for anchor links
+        $('a[href^="#"]').on('click', function(e) {
+            if (this.hash !== '') {
+                e.preventDefault();
+                
+                const hash = this.hash;
+                $('html, body').animate({
+                    scrollTop: $(hash).offset().top - 20
+                }, 300);
+            }
+        });
+        
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
     </script>
     
     @stack('scripts')
