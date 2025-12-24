@@ -18,6 +18,8 @@ class FacilityController extends Controller
             'pasar' => 'Pasar',
             'lainnya' => 'Lainnya'
         ];
+
+        $facilitiesJson = $facilities->toJson();
         
         return view('facilities.index', compact('facilities', 'facilityTypes'));
     }
