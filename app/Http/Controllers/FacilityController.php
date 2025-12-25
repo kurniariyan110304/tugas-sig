@@ -22,6 +22,21 @@ class FacilityController extends Controller
         return view('facilities.index', compact('facilities', 'facilityTypes'));
     }
 
+    public function dashboard()
+    {
+        $facilities = Facility::all();
+        $facilityTypes = [
+            'sekolah' => 'Sekolah',
+            'rumah_sakit' => 'Rumah Sakit',
+            'puskesmas' => 'Puskesmas',
+            'tempat_ibadah' => 'Tempat Ibadah',
+            'pasar' => 'Pasar',
+            'lainnya' => 'Lainnya'
+        ];
+
+        return view('facilities.dashboard', compact('facilities', 'facilityTypes'));
+    }
+
     public function create()
     {
         return view('facilities.create');
@@ -32,21 +47,16 @@ class FacilityController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:sekolah,rumah_sakit,puskesmas,tempat_ibadah,pasar,lainnya',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'address' => 'nullable|string',
             'description' => 'nullable|string'
         ]);
 
         Facility::create($validated);
 
-        return redirect()->route('facilities.index')
+        return redirect()->route('dashboard')
             ->with('success', 'Fasilitas berhasil ditambahkan!');
-    }
-
-    public function show(Facility $facility)
-    {
-        return view('facilities.show', compact('facility'));
     }
 
     public function edit(Facility $facility)
@@ -59,15 +69,15 @@ class FacilityController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:sekolah,rumah_sakit,puskesmas,tempat_ibadah,pasar,lainnya',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'address' => 'nullable|string',
             'description' => 'nullable|string'
         ]);
 
         $facility->update($validated);
 
-        return redirect()->route('facilities.index')
+        return redirect()->route('dashboard')
             ->with('success', 'Fasilitas berhasil diperbarui!');
     }
 
@@ -75,7 +85,7 @@ class FacilityController extends Controller
     {
         $facility->delete();
 
-        return redirect()->route('facilities.index')
+        return redirect()->route('dashboard')
             ->with('success', 'Fasilitas berhasil dihapus!');
     }
 
