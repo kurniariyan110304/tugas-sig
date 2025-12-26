@@ -45,25 +45,19 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => [
-                'required',
-                'confirmed', // butuh field password_confirmation di form
-                Password::min(8),
-            ],
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)],
         ]);
-
+    
         User::create([
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
-
-        // langsung login setelah register (opsional)
-        Auth::login(User::where('email', $validated['email'])->first());
-
-        $request->session()->regenerate();
-        return redirect()->route('dashboard');
+    
+        // jangan auto-login, langsung ke halaman login
+        return redirect()->route('login')->with('success', 'Registrasi berhasil. Silakan login.');
     }
+    
 
     public function logout(Request $request)
     {
