@@ -5,7 +5,7 @@
 @section('content')
     <div class="dashboard-header">
         <h1 class="header-title">
-            <i class="fas fa-map-marked-alt me-2"></i>
+            <img src="{{ asset('svg/logo.svg') }}" alt="Logo Fasilitas Umum" class="me-3" width="50">
             Dashboard Peta Fasilitas Umum
         </h1>
     </div>

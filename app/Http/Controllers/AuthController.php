@@ -22,16 +22,16 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        // optional: remember me jika ada checkbox name="remember"
-        $remember = $request->boolean('remember');
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate(); // penting untuk keamanan session
-            return redirect()->route('dashboard');
+            return redirect()->intended('/');
         }
 
         return back()
-            ->withErrors(['email' => 'Email atau password salah.'])
+            ->withErrors([
+                'email' => 'Email atau password salah.',
+            ])
             ->onlyInput('email');
     }
 
@@ -47,17 +47,17 @@ class AuthController extends Controller
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)],
         ]);
-    
+
         User::create([
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
-    
+
         // jangan auto-login, langsung ke halaman login
         return redirect()->route('login')->with('success', 'Registrasi berhasil. Silakan login.');
     }
-    
+
 
     public function logout(Request $request)
     {
@@ -66,6 +66,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 }

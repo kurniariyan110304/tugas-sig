@@ -71,15 +71,6 @@ $(document).ready(function () {
         loadingSpinner.removeClass('active');
     });
 
-    // Adjust content padding based on device
-    function adjustContentPadding() {
-        if ($(window).width() <= 992) {
-            mainContent.css('padding-top', '60px');
-        } else {
-            mainContent.css('padding-top', '0');
-        }
-    }
-
     // Initial adjustment
     adjustContentPadding();
 
@@ -155,28 +146,88 @@ function loadFacilities(type = 'all') {
         });
 }
 
+function autoFormatType(type) {
+    return type
+        ?.split('_')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+}
+
+const TYPE_ICONS = {
+    rumah_sakit: '/icons/hospital.svg',
+    sekolah: '/icons/school.svg',
+    puskesmas: '/icons/pharmacy.svg',
+    tempat_ibadah: '/icons/worship.svg',
+    pasar: '/icons/grocery.svg',
+    lainnya: '/icons/other.svg'
+};
+
+const TYPE_COLORS = {
+    rumah_sakit: '#ef4444',
+    sekolah: '#3b82f6',
+    puskesmas: '#22c55e',
+    tempat_ibadah: '#f59e0b',
+    pasar: '#8b5cf6',
+    lainnya: '#64748b'
+};
+
+function getTypeBadge(type) {
+    const color = TYPE_COLORS[type] || TYPE_COLORS.lainnya;
+
+    return `
+        <span style="
+            display:inline-block;
+            padding:3px 10px;
+            font-size:11px;
+            font-weight:600;
+            border-radius:999px;
+            background:${color}22;
+            color:${color};
+        ">
+            ${autoFormatType(type) ?? '-'}
+        </span>
+    `;
+}
+
 function addMarker(f) {
     if (!f?.latitude || !f?.longitude) return;
 
-    const popupContent = `
-        <div style="min-width:200px">
-            <h6 style="margin:0 0 6px;font-weight:600">
-                ${f.name ?? 'Tanpa Nama'}
-            </h6>
+    const iconUrl = TYPE_ICONS[f.type] || TYPE_ICONS.lainnya;
 
-            <div style="font-size:13px;line-height:1.4">
-                <div><strong>Jenis:</strong> ${f.type ?? '-'}</div>
-                <div><strong>Alamat:</strong> ${f.address ?? '-'}</div>
-            </div>
+    const customIcon = L.icon({
+        iconUrl: iconUrl,
+        iconSize: [22, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [-5, -30]
+    });
+
+    const popupContent = `
+        <div style="min-width:200px;font-family:'Nunito', sans-serif;">
+        <div style="display:flex; align-items:center; gap:6px;">
+            <h6 style="margin:0; font-weight:600;">
+            ${f.name ?? 'Tanpa Nama'}
+            </h6>
+            <div>
+                ${getTypeBadge(f.type) ?? '-'}
+            </div>  
+        </div>
+
+        <div style="font-size:13px;line-height:1.4; margin-top:10px">
+            ${f.address ?? '-'}
+        </div>
         </div>
     `;
 
-    const marker = L.marker([f.latitude, f.longitude])
+    const marker = L.marker(
+        [f.latitude, f.longitude],
+        { icon: customIcon }
+    )
         .addTo(map)
         .bindPopup(popupContent);
 
     markers.push(marker);
 }
+
 
 
 function clearMarkers() {

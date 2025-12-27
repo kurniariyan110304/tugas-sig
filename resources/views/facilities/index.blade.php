@@ -6,29 +6,34 @@
     <!-- Dashboard Header -->
     <div class="dashboard-header">
         <h1 class="header-title ">
-            <i class="fas fa-map-marked-alt me-2"></i>
+            <img src="{{ asset('svg/logo.svg') }}" alt="Logo Fasilitas Umum" class="me-3" width="50">
             Peta Fasilitas Umum
         </h1>
 
-        <div class="header-actions">
-            <select id="typeFilter" class="form-select">
-                <option value="all">Semua</option>
-                @foreach ($facilityTypes as $key => $label)
-                    <option value="{{ $key }}">{{ $label }}</option>
-                @endforeach
-            </select>
+        <div class="d-flex align-items-center gap-2">
+            <div class="header-actions">
+                <select id="typeFilter" class="form-select">
+                    <option value="all">Semua</option>
+                    @foreach ($facilityTypes as $key => $label)
+                        <option value="{{ $key }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            @if (!Auth::check())
+                <a href="{{ route('login') }}" class="btn btn-login">Login</a>
+            @endif
         </div>
+
+
     </div>
 
     <!-- Map Section -->
-    <div class="card shadow border-0 mb-4">
-        <div class="card-body p-0">
-            <div class="map-responsive-container">
-                <div id="map"></div>
-                <div id="mapLoading" class="loading-overlay" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                    </div>
-                </div>
+    <div class="map-responsive-container">
+        <div id="map"></div>
+
+        <div id="mapLoading" class="loading-overlay" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
             </div>
         </div>
     </div>

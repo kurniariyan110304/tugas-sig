@@ -20,17 +20,16 @@
 </head>
 
 <body>
-    <!-- Sidebar Navigation -->
-    @include('layouts.sidebar')
+    @if (Auth::check())
+        @include('layouts.sidebar')
+    @endif
 
-    <!-- Main Content Wrapper -->
     <div id="app-wrapper">
-        <main class="main-content" id="mainContent">
-            <div class="container-lg py-5">
+        <main class="{{ Auth::check() ? 'main-content' : 'guest-content' }}" id="mainContent">
+            <div class="container-lg py-3 md:py-4">
                 @yield('content')
             </div>
 
-            <!-- Main Footer -->
             @include('layouts.footer')
         </main>
     </div>
