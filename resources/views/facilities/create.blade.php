@@ -103,7 +103,7 @@
                                 @enderror
                             </div>
 
-                            <div class="mb-4">
+                            <div class="mb-4 w-full">
                                 <label for="type" class="form-label required-field">
                                     <i class="fas fa-tag"></i>
                                     Jenis Fasilitas

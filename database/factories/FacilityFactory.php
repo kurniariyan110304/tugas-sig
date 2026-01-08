@@ -18,7 +18,6 @@ class FacilityFactory extends Factory
                 'pasar',
                 'lainnya',
             ]),
-            // Koordinat sekitar Bogor (biar kelihatan di map)
             'latitude' => $this->faker->latitude(-6.7, -6.1),
             'longitude' => $this->faker->longitude(106.5, 107.1),
             'address' => $this->faker->address,
